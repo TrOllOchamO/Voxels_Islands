@@ -58,6 +58,9 @@ impl Plugin for Dimention {
         app.add_startup_system(spawn_world_system)
             .add_system(manage_chunks_system)
             .add_system(handle_generated_chunks_system)
-            .add_system(generate_chunk_mesh_system.after(manage_chunks_system));
+            .add_system_to_stage(
+                CoreStage::PostUpdate,
+                generate_chunk_mesh_system.after(manage_chunks_system),
+            );
     }
 }
