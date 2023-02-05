@@ -9,7 +9,7 @@ use crate::game::camera::{FirstPersonCamera, Position};
 use bevy::prelude::*;
 use bevy::tasks::{AsyncComputeTaskPool, Task};
 use futures_lite::future;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 
 const NB_CHUNKS_MAX_GENERATING_IN_THE_BACKGROUND: usize = 1;
 
@@ -35,9 +35,10 @@ pub fn manage_chunks_system(
         let chunks_to_unload = get_chunks_to_unload(&world, &cameras_pos);
         unload_chunks(&mut world, &mut commands, &chunks, &chunks_to_unload);
         let chunks_to_load = get_chunks_to_load(&world, &cameras_pos);
-        let chunks_to_generate =
-            load_chunks(&mut world, world_entity, &mut commands, &chunks_to_load);
-        start_generating_chunks(&mut world, world_entity, &mut commands, &chunks_to_generate);
+        let mut rated_chunks = rate_loading_priority(&chunks_to_load, &cameras_pos);
+        load_chunks(&mut world, world_entity, &mut commands, &mut rated_chunks);
+
+        start_generating_chunks(&mut world, world_entity, &mut commands, &rated_chunks);
     }
 }
 
@@ -108,30 +109,50 @@ fn get_chunks_to_load(
     chunks_to_load
 }
 
+fn rate_loading_priority(
+    chunks_to_load: &HashSet<(i32, i32, i32)>,
+    cameras_pos: &Query<&Position, With<FirstPersonCamera>>,
+) -> HashMap<(i32, i32, i32), f32> {
+    let mut rated_chunks = HashMap::new();
+    for coords in chunks_to_load.iter() {
+        rated_chunks.insert(*coords, 0.);
+    }
+
+    for camera in cameras_pos.iter() {
+        for ((x, y, z), key_score) in rated_chunks.iter_mut() {
+            let diff_x = (camera.x - *x as f32).powi(2);
+            let diff_y = (camera.y - *y as f32).powi(2);
+            let diff_z = (camera.z - *z as f32).powi(2);
+
+            let dist = (diff_x + diff_y + diff_z).sqrt();
+            let score = dist.sqrt();
+            *key_score += score;
+        }
+    }
+
+    rated_chunks
+}
+
 fn load_chunks(
     world: &mut World,
     world_entity: Entity,
     commands: &mut Commands,
-    chunks_to_load: &HashSet<(i32, i32, i32)>,
-) -> HashSet<(i32, i32, i32)> {
-    let has_already_been_generated = false;
-    let mut chunks_to_generate = chunks_to_load.clone();
-
-    for chunk in chunks_to_load.iter() {
-        // TODO chunk saving and loding
-        if has_already_been_generated {
-            chunks_to_generate.remove(&chunk);
-        }
-    }
-
-    chunks_to_generate
+    chunks_to_load: &mut HashMap<(i32, i32, i32), f32>,
+) {
+    // let has_already_been_generated = false;
+    // for chunk in chunks_to_load.keys() {
+    //     // TODO chunk saving and loding
+    //     if has_already_been_generated {
+    //         chunks_to_load.remove(chunk);
+    //     }
+    // }
 }
 
 fn start_generating_chunks(
     world: &mut World,
     world_entity: Entity,
     commands: &mut Commands,
-    chunks_to_generate: &HashSet<(i32, i32, i32)>,
+    rated_chunks_to_generate: &HashMap<(i32, i32, i32), f32>,
 ) {
     let nb_chunks_in_generation = world.chunks_in_generation.len();
     if nb_chunks_in_generation >= NB_CHUNKS_MAX_GENERATING_IN_THE_BACKGROUND {
@@ -143,7 +164,15 @@ fn start_generating_chunks(
     let nb_chunks_to_generate =
         NB_CHUNKS_MAX_GENERATING_IN_THE_BACKGROUND - nb_chunks_in_generation;
 
-    let mut chunks_to_generate = chunks_to_generate.iter().take(nb_chunks_to_generate);
+    let mut chunks_prioritized: Vec<(i32, i32, i32)> =
+        rated_chunks_to_generate.keys().cloned().collect();
+    chunks_prioritized.sort_by(|coords1, coords2| {
+        let score1 = rated_chunks_to_generate.get(coords1).unwrap();
+        let score2 = rated_chunks_to_generate.get(coords2).unwrap();
+        score1.partial_cmp(score2).unwrap()
+    });
+
+    let mut chunks_to_generate = chunks_prioritized.iter().take(nb_chunks_to_generate);
 
     while let Some(&chunk_coords) = chunks_to_generate.next() {
         let (x, y, z) = chunk_coords;
