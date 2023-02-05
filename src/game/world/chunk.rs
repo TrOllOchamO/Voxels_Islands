@@ -36,6 +36,7 @@ impl ChunkCoordinates {
     }
 }
 
+#[derive(Clone)]
 pub struct ChunkData(Vec<Block>);
 
 impl Default for ChunkData {
@@ -62,7 +63,7 @@ impl ChunkData {
 #[derive(Component, Default)]
 pub struct Chunk {
     coords: ChunkCoordinates,
-    blocks: ChunkData,
+    pub blocks: ChunkData,
 }
 
 impl Chunk {

@@ -1,10 +1,13 @@
 use super::chunk::Chunk;
 use super::pre_mesh_creator::{ChunkPreMesh, NeighborChunks};
 use super::pre_mesh_to_bundle_conveter::get_faces_mesh;
+use crate::game::world::chunk::ChunkData;
+use crate::game::world::world::CHUNK_SIZE_I32;
 use crate::world::World;
 use bevy::prelude::*;
 use bevy::render::mesh::Mesh;
 use bevy::render::mesh::{self, PrimitiveTopology};
+use std::collections::HashMap;
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 pub enum Face {
@@ -30,10 +33,42 @@ fn remove_old_meshes(
     chunks_meshes: &mut Query<(&Parent, Entity), With<ChunkMeshTag>>,
     commands: &mut Commands,
 ) {
-    for (parent_chunk, mesh_entity) in chunks_meshes.iter_mut() {
+    for (parent_chunk, mesh_entity) in chunks_meshes.iter() {
         if parent_chunk.get() == chunk_entity {
             commands.entity(mesh_entity).despawn_recursive();
         }
+    }
+}
+
+fn get_chunk_data(
+    chunk_coords: (i32, i32, i32),
+    world_chunks: &HashMap<(i32, i32, i32), Entity>,
+    chunks: &Query<(Entity, &Parent, &Chunk)>,
+) -> Option<ChunkData> {
+    if !world_chunks.contains_key(&chunk_coords) {
+        return None;
+    }
+
+    match world_chunks.get(&chunk_coords) {
+        None => None,
+        Some(chunk_entity) => {
+            let (_, _, chunk) = chunks.get(*chunk_entity).unwrap();
+            Some(chunk.blocks.clone())
+        }
+    }
+}
+
+fn get_neighbor_chunks(
+    chunk_coords: (i32, i32, i32),
+    world_chunks: &HashMap<(i32, i32, i32), Entity>,
+    chunks: &Query<(Entity, &Parent, &Chunk)>,
+) -> NeighborChunks {
+    let (x, y, z) = chunk_coords;
+    NeighborChunks {
+        positive_x: get_chunk_data((x + CHUNK_SIZE_I32, y, z), world_chunks, chunks),
+        negative_x: get_chunk_data((x - CHUNK_SIZE_I32, y, z), world_chunks, chunks),
+        positive_z: get_chunk_data((x, y, z + CHUNK_SIZE_I32), world_chunks, chunks),
+        negative_z: get_chunk_data((x, y, z - CHUNK_SIZE_I32), world_chunks, chunks),
     }
 }
 
@@ -41,29 +76,17 @@ pub fn generate_chunk_mesh_system(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
-    mut worlds: Query<&mut World>,
-    mut chunks: Query<(Entity, &Chunk), With<Chunk>>,
+    mut worlds: Query<(Entity, &mut World)>,
+    chunks: Query<(Entity, &Parent, &Chunk)>,
     mut chunks_meshes: Query<(&Parent, Entity), With<ChunkMeshTag>>,
 ) {
-    for mut world_struct in worlds.iter_mut() {
-        for (chunk_entity, chunk) in chunks.iter_mut() {
-            if commands.get_entity(chunk_entity).is_none() {
-                continue;
-            }
-
-            let chunk_coords = chunk.get_coords().to_tuple();
-            if !world_struct.chunks_to_render.contains(&chunk_coords) {
-                continue;
-            }
-
-            remove_old_meshes(chunk_entity, &mut chunks_meshes, &mut commands);
-
-            let neighbor_chunks = NeighborChunks {
-                positive_x: None,
-                negative_x: None,
-                positive_z: None,
-                negative_z: None,
-            };
+    for (world_entity, mut world_struct) in worlds.iter_mut() {
+        let world_chunks = get_world_chunks(world_entity, &chunks);
+        let mut chunks_to_render = get_chunks_to_render(&world_struct, &world_chunks, &chunks);
+        for (chunk_coords, chunk_to_render_entity) in chunks_to_render.drain() {
+            remove_old_meshes(chunk_to_render_entity, &mut chunks_meshes, &mut commands);
+            let (_, _, chunk) = chunks.get(chunk_to_render_entity).unwrap();
+            let neighbor_chunks = get_neighbor_chunks(chunk_coords, &world_chunks, &chunks);
 
             let mut chunk_pre_meshes = ChunkPreMesh::new(chunk.as_slice());
             chunk_pre_meshes.optimise(&neighbor_chunks);
@@ -99,8 +122,38 @@ pub fn generate_chunk_mesh_system(
             world_struct.chunks_to_render.remove(&chunk_coords);
             commands.add(move |world: &mut bevy::ecs::prelude::World| {
                 let entities: Vec<_> = world.spawn_batch(bundles).collect();
-                world.entity_mut(chunk_entity).push_children(&entities);
+                world
+                    .entity_mut(chunk_to_render_entity)
+                    .push_children(&entities);
             });
         }
     }
+}
+
+fn get_chunks_to_render(
+    world: &World,
+    world_chunks: &HashMap<(i32, i32, i32), Entity>,
+    chunks: &Query<(Entity, &Parent, &Chunk)>,
+) -> HashMap<(i32, i32, i32), Entity> {
+    let mut chunks_to_render = world_chunks.clone();
+    chunks_to_render.retain(|_, chunk_entity| {
+        let (_, _, chunk) = chunks.get(*chunk_entity).unwrap();
+        let chunk_coords = chunk.get_coords().to_tuple();
+        world.chunks_to_render.contains(&chunk_coords)
+    });
+    chunks_to_render
+}
+
+fn get_world_chunks(
+    world_entity: Entity,
+    chunks: &Query<(Entity, &Parent, &Chunk)>,
+) -> HashMap<(i32, i32, i32), Entity> {
+    let mut world_chunks = HashMap::new();
+    for (chunk_entity, chunk_parent, chunk) in chunks.iter() {
+        if world_entity == chunk_parent.get() {
+            let chunk_coords = chunk.get_coords().to_tuple();
+            world_chunks.insert(chunk_coords, chunk_entity);
+        }
+    }
+    world_chunks
 }
