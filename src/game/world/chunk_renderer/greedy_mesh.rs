@@ -1,4 +1,4 @@
-use super::chunk::{CHUNK_HEIGHT, CHUNK_SIZE, NB_BLOCKS_PER_CHUNK};
+use super::chunk::{CHUNK_SIZE, NB_BLOCKS_PER_CHUNK};
 use super::pre_mesh_creator::{
     BlockPreMesh, ChunkPreMeshOneDirection, Stretch, NB_BLOCK_ON_CHUNK_SIDE,
 };

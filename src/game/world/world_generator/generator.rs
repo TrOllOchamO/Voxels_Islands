@@ -1,7 +1,7 @@
 use super::chunk::{BlockPosition, Chunk, ChunkCoordinates};
 use crate::game::world::block::{Block, BlockOrientation};
-use crate::game::world::chunk_renderer::blocks_resources::{
-    AIR_BLOCK_ID, GRASS_BLOCK_ID, SAND_BLOCK_ID, WATER_BLOCK_ID,
+use crate::game::world::chunk_renderer::blocks_resources::blocks::{
+    AIR_BLOCK, GRASS_BLOCK, SAND_BLOCK, WATER_BLOCK,
 };
 use noise::{NoiseFn, Perlin};
 use std::i32::MIN;
@@ -29,15 +29,15 @@ impl WorldGenerator {
             let noise_value = self.perlin.get(noise_coords);
             if pos.get_y() as f64 / 256. > noise_value {
                 if pos.get_y() <= 64 {
-                    block.0 = Block::new(WATER_BLOCK_ID, BlockOrientation::PositiveX).0;
+                    block.0 = Block::new(WATER_BLOCK, BlockOrientation::PositiveX).0;
                 } else {
-                    block.0 = Block::new(AIR_BLOCK_ID, BlockOrientation::PositiveX).0;
+                    block.0 = Block::new(AIR_BLOCK, BlockOrientation::PositiveX).0;
                 }
             } else {
                 if pos.get_y() >= 66 {
-                    block.0 = Block::new(GRASS_BLOCK_ID, BlockOrientation::PositiveX).0;
+                    block.0 = Block::new(GRASS_BLOCK, BlockOrientation::PositiveX).0;
                 } else {
-                    block.0 = Block::new(SAND_BLOCK_ID, BlockOrientation::PositiveX).0;
+                    block.0 = Block::new(SAND_BLOCK, BlockOrientation::PositiveX).0;
                 }
             }
         }

@@ -1,3 +1,5 @@
+use std::f32::consts::PI;
+
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
@@ -19,10 +21,35 @@ fn main() {
         .run();
 }
 
-// set the light
+// set lighting
 fn setup_system(mut commands: Commands) {
-    commands.insert_resource(AmbientLight {
-        color: Color::WHITE,
-        brightness: 0.08,
+    // commands.insert_resource(AmbientLight {
+    //     color: Color::WHITE,
+    //     brightness: 0.10,
+    // });
+
+    const HALF_SIZE: f32 = 10.0;
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight {
+            // Configure the projection to better fit the scene
+            shadow_projection: OrthographicProjection {
+                left: -HALF_SIZE,
+                right: HALF_SIZE,
+                bottom: -HALF_SIZE,
+                top: HALF_SIZE,
+                near: -10.0 * HALF_SIZE,
+                far: 10.0 * HALF_SIZE,
+                ..default()
+            },
+            shadows_enabled: false,
+            illuminance: 32_000.0,
+            ..default()
+        },
+        transform: Transform {
+            translation: Vec3::new(0.0, 2.0, 0.0),
+            rotation: Quat::from_rotation_x(-PI / 4.),
+            ..default()
+        },
+        ..default()
     });
 }

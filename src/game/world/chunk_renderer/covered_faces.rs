@@ -1,7 +1,7 @@
+use super::blocks_resources::block_is_transparent;
 use super::chunk::ChunkData;
 use super::pre_mesh_creator::ChunkPreMeshOneDirection;
 use super::pre_mesh_creator::{NB_BLOCK_ON_CHUNK_SIDE, NB_BLOCK_ON_CHUNK_WITHOUT_ONE_SIDE};
-use super::resource_extractor::block_is_transparent;
 use crate::game::world::block::Block;
 use crate::game::world::chunk::CHUNK_SIZE;
 

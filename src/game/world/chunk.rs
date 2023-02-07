@@ -1,6 +1,5 @@
-use super::block::{Block, BlockOrientation};
+use super::block::Block;
 
-use super::chunk_renderer::blocks_resources::{AIR_BLOCK_ID, DEBUG_BLOCK_ID};
 use bevy::prelude::*;
 
 pub const CHUNK_SIZE: usize = 16;

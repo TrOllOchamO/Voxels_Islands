@@ -1,9 +1,9 @@
 use crate::game::world::chunk::BlockPosition;
 
+use super::blocks_resources::block_color;
 use super::chunk::NB_BLOCKS_PER_CHUNK;
 use super::pre_mesh_creator::{BlockPreMesh, ChunkPreMesh, ChunkPreMeshOneDirection};
 use super::renderer::Face;
-use super::resource_extractor;
 use bevy::prelude::*;
 
 use std::collections::HashMap;
@@ -130,7 +130,7 @@ fn convert_chunk_pre_mesh_data_into_faces_mesh(
             }
         };
 
-        let extracted_color = resource_extractor::block_color(pre_mesh.get_block().get_id());
+        let extracted_color = block_color(pre_mesh.get_block().get_id());
         let color = extracted_color.unwrap_or(DEFAULT_COLOR);
         let key = color.as_rgba_u32();
 

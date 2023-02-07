@@ -1,5 +1,5 @@
-use super::block::{Block, BlockOrientation};
-use super::blocks_resources::AIR_BLOCK_ID;
+use super::block::Block;
+use super::blocks_resources::blocks::AIR_BLOCK;
 use super::chunk::{ChunkData, CHUNK_HEIGHT, CHUNK_SIZE, NB_BLOCKS_PER_CHUNK};
 use super::covered_faces::*;
 use super::greedy_mesh::*;
@@ -148,7 +148,7 @@ impl ChunkPreMeshOneDirection {
 
             let mut stretch = Stretch::default();
 
-            if block.get_id() == AIR_BLOCK_ID {
+            if block.get_id() == AIR_BLOCK {
                 stretch.0 = 0;
             }
 

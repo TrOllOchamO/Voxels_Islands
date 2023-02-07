@@ -6,4 +6,3 @@ use super::block;
 use super::chunk;
 pub mod blocks_resources;
 mod pre_mesh_to_bundle_conveter;
-mod resource_extractor;
