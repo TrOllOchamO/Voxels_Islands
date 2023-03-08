@@ -1,6 +1,6 @@
 use super::chunk::{BlockPosition, Chunk, ChunkCoordinates};
 use crate::game::world::block::{Block, BlockOrientation};
-use crate::game::world::chunk_renderer::blocks_resources::blocks::{
+use crate::game::world::chunk_renderer::blocks_resources::blocks_ids::{
     AIR_BLOCK, GRASS_BLOCK, SAND_BLOCK, WATER_BLOCK,
 };
 use noise::{NoiseFn, Perlin};

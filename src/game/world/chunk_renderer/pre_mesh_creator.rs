@@ -1,5 +1,5 @@
 use super::block::Block;
-use super::blocks_resources::blocks::AIR_BLOCK;
+use super::blocks_resources::blocks_ids::AIR_BLOCK;
 use super::chunk::{ChunkData, CHUNK_HEIGHT, CHUNK_SIZE, NB_BLOCKS_PER_CHUNK};
 use super::covered_faces::*;
 use super::greedy_mesh::*;
