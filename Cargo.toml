@@ -12,9 +12,11 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-bevy = { version = "0.9.1" }
-bevy-inspector-egui = "0.14.0"
+bevy = "0.10.0"
+bevy-inspector-egui = "0.18.0"
 futures-lite = "1.12.0"
 noise = "0.8.2"
 rand = "0.8.5"
 blocks_macro = { path = "src/blocks_macro" }
+winit = "0.28.2"
+

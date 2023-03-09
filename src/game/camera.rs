@@ -1,5 +1,6 @@
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
+use bevy::window::{CursorGrabMode, PrimaryWindow};
 use std::f32::consts::PI;
 
 const MOBILITY_SPEED: f32 = 20.;
@@ -144,23 +145,24 @@ fn rotate_camera_system(mut query: Query<(&Rotation, &mut Transform), With<First
 }
 
 fn cursor_grab_system(
-    mut windows: ResMut<Windows>,
+    mut primary_query: Query<&mut Window, With<PrimaryWindow>>,
     btn: Res<Input<MouseButton>>,
     key: Res<Input<KeyCode>>,
     mut query: Query<&mut FirstPersonCamera>,
 ) {
-    let window = windows.get_primary_mut().unwrap();
-
+    let Ok(mut primary) = primary_query.get_single_mut() else {
+        return;
+    };
     for mut camera in query.iter_mut() {
         if btn.just_pressed(MouseButton::Right) {
-            window.set_cursor_grab_mode(bevy::window::CursorGrabMode::Locked);
-            window.set_cursor_visibility(false);
+            primary.cursor.grab_mode = CursorGrabMode::Locked;
+            primary.cursor.visible = false;
             camera.has_focus = true;
         }
 
         if key.just_pressed(KeyCode::Escape) {
-            window.set_cursor_grab_mode(bevy::window::CursorGrabMode::None);
-            window.set_cursor_visibility(true);
+            primary.cursor.grab_mode = CursorGrabMode::None;
+            primary.cursor.visible = true;
             camera.has_focus = false;
         }
     }

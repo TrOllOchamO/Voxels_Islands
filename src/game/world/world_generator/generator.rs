@@ -27,7 +27,7 @@ impl WorldGenerator {
             let pos = BlockPosition::from_block_index(i);
             let noise_coords = get_noise_coords(&pos, chunk_x, chunk_z);
             let noise_value = self.perlin.get(noise_coords);
-            if pos.get_y() as f64 / 256. > noise_value {
+            if pos.get_y() as f64 / 256. > (noise_value + 1.) / 2. {
                 if pos.get_y() <= 64 {
                     block.0 = Block::new(WATER_BLOCK, BlockOrientation::PositiveX).0;
                 } else {
