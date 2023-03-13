@@ -8,19 +8,15 @@ const AIR_BLOCK: u16 = 0x0000;
 #[derive(Clone, Copy, Default, PartialEq, Eq)]
 pub struct Block(pub u16);
 
+#[derive(Default)]
 pub enum BlockOrientation {
+    #[default]
     PositiveX,
     NegativeX,
     PositiveY,
     NegativeY,
     PositiveZ,
     NegativeZ,
-}
-
-impl Default for BlockOrientation {
-    fn default() -> Self {
-        BlockOrientation::PositiveX
-    }
 }
 
 impl Block {
@@ -45,7 +41,7 @@ impl Block {
             3 => BlockOrientation::NegativeY,
             4 => BlockOrientation::PositiveZ,
             5 => BlockOrientation::NegativeZ,
-            _ => panic!(),
+            _ => unreachable!(),
         }
     }
 

@@ -143,18 +143,16 @@ impl ChunkPreMeshOneDirection {
     pub fn new(chunk_data: &[Block]) -> Self {
         let mut blocks_pre_mesh_data = Vec::with_capacity(NB_BLOCKS_PER_CHUNK);
 
-        for i in 0..NB_BLOCKS_PER_CHUNK {
-            let block = chunk_data[i];
-
+        for block in chunk_data.iter().take(NB_BLOCKS_PER_CHUNK) {
             let mut stretch = Stretch::default();
 
             if block.get_id() == AIR_BLOCK {
                 stretch.0 = 0;
             }
 
-            blocks_pre_mesh_data.push(BlockPreMesh::new(block, stretch));
+            blocks_pre_mesh_data.push(BlockPreMesh::new(*block, stretch));
         }
-
+        assert!(blocks_pre_mesh_data.len() == NB_BLOCKS_PER_CHUNK);
         Self(blocks_pre_mesh_data)
     }
 
