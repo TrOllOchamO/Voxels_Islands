@@ -1,4 +1,4 @@
-use crate::game::world::chunk::BlockPosition;
+use crate::game::world::coordinates::block_coords_in_chunk::BlockCoordsInChunk;
 
 use super::blocks_resources::block_color;
 use super::chunk::NB_BLOCKS_PER_CHUNK;
@@ -150,7 +150,8 @@ fn convert_block_pre_mesh_to_faces_mesh_on_positive_x(
     block_index: usize,
 ) -> FacesMesh {
     let (_, stretch_y, stretch_z) = block_pre_mesh.get_stretch().get_final_stretch();
-    let (block_x, block_y, block_z) = BlockPosition::from_block_index(block_index).pos_tuple_f32();
+    let (block_x, block_y, block_z) =
+        BlockCoordsInChunk::from_block_index(block_index).pos_tuple_f32();
     let px = block_x + 1.;
     let py = block_y + 1.;
     let pz = block_z + 1.;
@@ -174,7 +175,8 @@ fn convert_block_pre_mesh_to_faces_mesh_on_negative_x(
     block_index: usize,
 ) -> FacesMesh {
     let (_, stretch_y, stretch_z) = block_pre_mesh.get_stretch().get_final_stretch();
-    let (block_x, block_y, block_z) = BlockPosition::from_block_index(block_index).pos_tuple_f32();
+    let (block_x, block_y, block_z) =
+        BlockCoordsInChunk::from_block_index(block_index).pos_tuple_f32();
     let px = block_x;
     let py = block_y + 1.;
     let pz = block_z + 1.;
@@ -198,7 +200,8 @@ fn convert_block_pre_mesh_to_faces_mesh_on_positive_y(
     block_index: usize,
 ) -> FacesMesh {
     let (stretch_x, _, stretch_z) = block_pre_mesh.get_stretch().get_final_stretch();
-    let (block_x, block_y, block_z) = BlockPosition::from_block_index(block_index).pos_tuple_f32();
+    let (block_x, block_y, block_z) =
+        BlockCoordsInChunk::from_block_index(block_index).pos_tuple_f32();
     let px = block_x + 1.;
     let py = block_y + 1.;
     let pz = block_z + 1.;
@@ -222,7 +225,8 @@ fn convert_block_pre_mesh_to_faces_mesh_on_negative_y(
     block_index: usize,
 ) -> FacesMesh {
     let (stretch_x, _, stretch_z) = block_pre_mesh.get_stretch().get_final_stretch();
-    let (block_x, block_y, block_z) = BlockPosition::from_block_index(block_index).pos_tuple_f32();
+    let (block_x, block_y, block_z) =
+        BlockCoordsInChunk::from_block_index(block_index).pos_tuple_f32();
     let px = block_x + 1.;
     let py = block_y;
     let pz = block_z + 1.;
@@ -246,7 +250,8 @@ fn convert_block_pre_mesh_to_faces_mesh_on_positive_z(
     block_index: usize,
 ) -> FacesMesh {
     let (stretch_x, stretch_y, _) = block_pre_mesh.get_stretch().get_final_stretch();
-    let (block_x, block_y, block_z) = BlockPosition::from_block_index(block_index).pos_tuple_f32();
+    let (block_x, block_y, block_z) =
+        BlockCoordsInChunk::from_block_index(block_index).pos_tuple_f32();
     let px = block_x + 1.;
     let py = block_y + 1.;
     let pz = block_z + 1.;
@@ -270,7 +275,8 @@ fn convert_block_pre_mesh_to_faces_mesh_on_negative_z(
     block_index: usize,
 ) -> FacesMesh {
     let (stretch_x, stretch_y, _) = block_pre_mesh.get_stretch().get_final_stretch();
-    let (block_x, block_y, block_z) = BlockPosition::from_block_index(block_index).pos_tuple_f32();
+    let (block_x, block_y, block_z) =
+        BlockCoordsInChunk::from_block_index(block_index).pos_tuple_f32();
     let px = block_x + 1.;
     let py = block_y + 1.;
     let pz = block_z;
