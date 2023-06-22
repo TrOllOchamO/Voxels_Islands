@@ -1,8 +1,14 @@
 use super::biomes::biome::Biome;
 use super::chunk::AbleToGenerateChunk;
-use super::{biomes::desert_biome::DesertBiome, chunk::Chunk};
+use super::{
+    biomes::{desert_biome::DesertBiome, grass_hills_biome::GrassHillsBiome},
+    chunk::Chunk,
+};
 use crate::game::world::coordinates::biome_coordinates::BiomeCoordinates;
 use noise::SuperSimplex;
+
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 #[derive(Clone)]
 pub struct WorldGenNoises {
@@ -30,8 +36,16 @@ impl WorldGenerator {
     }
 
     fn get_biome_at(biome_coords: &BiomeCoordinates) -> Biome {
-        // TODO a match when we will have more than one biome
-        Biome::Desert(DesertBiome)
+        let mut hasher = DefaultHasher::new();
+        biome_coords.hash(&mut hasher);
+
+        // replace the hard coded value by this when it will be stable
+        // mem::variant_count::<Biome>() as u64
+        match hasher.finish() % 2 {
+            0 => Biome::Desert(DesertBiome),
+            1 => Biome::GrassHills(GrassHillsBiome),
+            _ => unreachable!(),
+        }
     }
 
     pub fn generate_chunk(&self, chunk: &mut Chunk) {

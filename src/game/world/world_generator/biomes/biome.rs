@@ -5,7 +5,7 @@ use crate::game::world::{
     world_generator::generator::WorldGenNoises,
 };
 
-pub const BIOME_SIZE_IN_CHUNKS: usize = 64;
+pub const BIOME_SIZE_IN_CHUNKS: usize = 128;
 pub const BIOME_SIZE_IN_BLOCKS: usize = CHUNK_SIZE * BIOME_SIZE_IN_CHUNKS;
 pub const OCEAN_LEVEL: u32 = 48;
 
