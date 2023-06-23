@@ -6,9 +6,9 @@ use std::collections::HashSet;
 
 use super::chunk::CHUNK_SIZE;
 pub const CHUNK_SIZE_I32: i32 = CHUNK_SIZE as i32;
-pub const RENDER_RADIUS: i32 = 16;
+pub const RENDER_RADIUS: i32 = 32;
 pub const DIST_TO_LOAD_CHUNK: i32 = RENDER_RADIUS * CHUNK_SIZE_I32;
-pub const UNLOAD_RADIUS: i32 = 20;
+pub const UNLOAD_RADIUS: i32 = 35;
 pub const DIST_TO_UNLOAD_CHUNK: i32 = UNLOAD_RADIUS * CHUNK_SIZE_I32;
 
 #[derive(Component)]

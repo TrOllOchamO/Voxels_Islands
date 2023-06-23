@@ -3,7 +3,7 @@ use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 use std::f32::consts::PI;
 
-const MOBILITY_SPEED: f32 = 20.;
+const MOBILITY_SPEED: f32 = 50.;
 const CAMERA_SENSIBILITY: f32 = 0.005;
 
 #[derive(Component, Default)]

@@ -1,2 +1,2 @@
 pub mod circular_island;
-pub mod erosion;
+pub mod circular_island_fading_edges;
